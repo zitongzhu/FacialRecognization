@@ -136,13 +136,11 @@ class Model:
     #Train the model
     def train(self, dataset, batch_size = 20, nb_epoch = 10, data_augmentation = True):        
         sgd = SGD(lr = 0.01, decay = 1e-6, 
-                  momentum = 0.9, nesterov = True) #采用SGD+momentum的优化器进行训练，首先生成一个优化器对象  
+                  momentum = 0.9, nesterov = True)
         self.model.compile(loss='categorical_crossentropy',
                            optimizer=sgd,
                            metrics=['accuracy'])   #compile model
         
-        #不使用数据提升，所谓的提升就是从我们提供的训练数据中利用旋转、翻转、加噪声等方法创造新的
-        #训练数据，有意识的提升训练数据规模，增加模型训练量
         if not data_augmentation:            
             self.model.fit(dataset.train_images,
                            dataset.train_labels,
@@ -152,8 +150,6 @@ class Model:
                            shuffle = True)
         #Change the dataset to improve
         else:            
-            #定义数据生成器用于数据提升，其返回一个生成器对象datagen，datagen每被调用一
-            #次其生成一组数据（顺序生成），节省内存，其实就是python的数据生成器
             datagen = ImageDataGenerator(
                 featurewise_center = False,             
                 samplewise_center  = False,             
@@ -168,7 +164,6 @@ class Model:
 
             datagen.fit(dataset.train_images)                        
  
-            #利用生成器开始训练模型
             self.model.fit_generator(datagen.flow(dataset.train_images, dataset.train_labels,
                                                    batch_size = batch_size),
                                      samples_per_epoch = dataset.train_images.shape[0],
@@ -225,9 +220,7 @@ def main1(username):
     dataset.load()
     model = Model(username)
     model.build_model(dataset)  
-    #先前添加的测试build_model()函数的代码
     model.build_model(dataset)
-    #测试训练函数的代码
     model.train(dataset)
 
     
